@@ -39,6 +39,7 @@ type Dependencies struct {
 	SetResult      func(*SetResult)
 	GetPendings    func(*GetPendings)
 	GetJet         func(*GetJet)
+	GetPulse       func(*GetPulse)
 	HotObjects     func(*HotObjects)
 	PassState      func(*PassState)
 	CalculateID    func(*CalculateID)
@@ -170,6 +171,12 @@ func NewDependencies(
 		GetJet: func(p *GetJet) {
 			p.Dep(
 				jetStorage,
+				sender,
+			)
+		},
+		GetPulse: func(p *GetPulse) {
+			p.Dep(
+				jetCoordinator,
 				sender,
 			)
 		},
