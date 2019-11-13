@@ -97,7 +97,7 @@ func (p *GetPulse) Proceed(ctx context.Context) error {
 		return nil
 	case *payload.Error:
 		return &payload.CodedError{
-			Text: fmt.Sprint("failed to fetch pulse data from heavy: ", rep.Text),
+			Text: fmt.Sprintf("failed to fetch pulse data from heavy: %v, pulse=%v", rep.Text, p.pulse.String()),
 			Code: rep.Code,
 		}
 	default:

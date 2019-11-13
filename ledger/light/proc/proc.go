@@ -238,6 +238,7 @@ func NewDependenciesMock() *Dependencies {
 		SetResult:      func(*SetResult) {},
 		GetPendings:    func(*GetPendings) {},
 		GetJet:         func(*GetJet) {},
+		GetPulse:       func(*GetPulse) {},
 		HotObjects:     func(*HotObjects) {},
 		PassState:      func(*PassState) {},
 		CalculateID:    func(*CalculateID) {},
