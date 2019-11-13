@@ -125,3 +125,12 @@ func (d *prototypeDescriptor) HeadRef() *insolar.Reference {
 func (d *prototypeDescriptor) StateID() *insolar.ID {
 	return &d.state
 }
+
+type pulseDescriptor struct {
+	pulse insolar.Pulse
+}
+
+// Pulse returns pulse data.
+func (d *pulseDescriptor) Pulse() *insolar.Pulse {
+	return &d.pulse
+}

@@ -94,7 +94,12 @@ func (le *logicExecutor) ExecuteMethod(ctx context.Context, transcript *common.T
 		return nil, errors.Wrap(err, "couldn't get executor")
 	}
 
-	transcript.LogicContext = le.genLogicCallContext(ctx, transcript, protoDesc, codeDesc)
+	pulse, err := le.DescriptorsCache.GetPulseForRequest(ctx, transcript.RequestRef)
+	if err != nil {
+		return nil, errors.Wrap(err, "couldn't get pulse")
+	}
+
+	transcript.LogicContext = le.genLogicCallContext(ctx, transcript, protoDesc, codeDesc, pulse)
 
 	newData, result, err := executor.CallMethod(
 		ctx, transcript.LogicContext, *codeDesc.Ref(), objDesc.Memory(), request.Method, request.Arguments,
@@ -152,7 +157,12 @@ func (le *logicExecutor) ExecuteConstructor(
 		return nil, errors.Wrap(err, "couldn't get executor")
 	}
 
-	transcript.LogicContext = le.genLogicCallContext(ctx, transcript, protoDesc, codeDesc)
+	pulseDesc, err := le.DescriptorsCache.GetPulseForRequest(ctx, transcript.RequestRef)
+	if err != nil {
+		return nil, errors.Wrap(err, "couldn't get pulse")
+	}
+
+	transcript.LogicContext = le.genLogicCallContext(ctx, transcript, protoDesc, codeDesc, pulseDesc)
 
 	newData, result, err := executor.CallConstructor(ctx, transcript.LogicContext, *codeDesc.Ref(), request.Method, request.Arguments)
 	if err != nil {
@@ -174,6 +184,7 @@ func (le *logicExecutor) genLogicCallContext(
 	transcript *common.Transcript,
 	protoDesc artifacts.PrototypeDescriptor,
 	codeDesc artifacts.CodeDescriptor,
+	pulseDesc artifacts.PulseDescriptor,
 ) *insolar.LogicCallContext {
 	request := transcript.Request
 	reqRef := transcript.RequestRef
@@ -185,6 +196,7 @@ func (le *logicExecutor) genLogicCallContext(
 		Callee:    nil, // below
 		Prototype: protoDesc.HeadRef(),
 		Code:      codeDesc.Ref(),
+		Pulse:     pulseDesc.Pulse(),
 
 		Caller:          &request.Caller,
 		CallerPrototype: &request.CallerPrototype,

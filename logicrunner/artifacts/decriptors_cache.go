@@ -30,12 +30,14 @@ type descriptorsCache struct {
 
 	codeCache  cache
 	protoCache cache
+	pulseCache cache
 }
 
 func NewDescriptorsCache() DescriptorsCache {
 	return &descriptorsCache{
 		codeCache:  newSingleFlightCache(),
 		protoCache: newSingleFlightCache(),
+		pulseCache: newSingleFlightCache(),
 	}
 }
 
@@ -104,10 +106,23 @@ func (c *descriptorsCache) GetCode(
 	return res.(CodeDescriptor), nil
 }
 
+func (c *descriptorsCache) GetPulseForRequest(ctx context.Context, request insolar.Reference) (PulseDescriptor, error) {
+	pn := request.GetLocal().Pulse()
+
+	res, err := c.pulseCache.get(pn, func() (interface{}, error) {
+		return c.Client.GetPulseForRequest(ctx, request)
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "couldn't get pulse for request: %s", request)
+	}
+
+	return res.(PulseDescriptor), nil
+}
+
 //go:generate minimock -i github.com/insolar/insolar/logicrunner/artifacts.cache -o ./ -s _mock.go -g
 
 type cache interface {
-	get(ref insolar.Reference, getter func() (val interface{}, err error)) (val interface{}, err error)
+	get(key interface{}, getter func() (val interface{}, err error)) (val interface{}, err error)
 }
 
 type cacheEntry struct {
@@ -117,32 +132,32 @@ type cacheEntry struct {
 
 type singleFlightCache struct {
 	mu sync.Mutex
-	m  map[insolar.Reference]*cacheEntry
+	m  map[interface{}]*cacheEntry
 }
 
 func newSingleFlightCache() cache {
 	return &singleFlightCache{
-		m: make(map[insolar.Reference]*cacheEntry),
+		m: make(map[interface{}]*cacheEntry),
 	}
 }
 
-func (c *singleFlightCache) getEntry(ref insolar.Reference) *cacheEntry {
+func (c *singleFlightCache) getEntry(key interface{}) *cacheEntry {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if _, ok := c.m[ref]; !ok {
-		c.m[ref] = &cacheEntry{}
+	if _, ok := c.m[key]; !ok {
+		c.m[key] = &cacheEntry{}
 	}
-	return c.m[ref]
+	return c.m[key]
 }
 
 func (c *singleFlightCache) get(
-	ref insolar.Reference,
+	key interface{},
 	getter func() (value interface{}, err error),
 ) (
 	interface{}, error,
 ) {
-	e := c.getEntry(ref)
+	e := c.getEntry(key)
 
 	e.mu.Lock()
 	defer e.mu.Unlock()

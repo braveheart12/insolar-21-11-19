@@ -206,6 +206,43 @@ func (m *client) RegisterOutgoingRequest(ctx context.Context, request *record.Ou
 	return res, err
 }
 
+// GetPulseForRequest returns pulse data for pulse number from request.
+func (m *client) GetPulseForRequest(
+	ctx context.Context, request insolar.Reference,
+) (PulseDescriptor, error) {
+	var err error
+	ctx, instrumenter := instrument(ctx, "GetPulseForRequest", &err)
+	defer instrumenter.end()
+
+	foundedPulse, err := m.PulseAccessor.ForPulseNumber(ctx, request.GetLocal().Pulse())
+	if err != nil {
+		getPulse := &payload.GetPulse{
+			PulseNumber: request.GetLocal().Pulse(),
+		}
+
+		pl, err := m.sendToLight(
+			ctx, bus.NewRetrySender(m.sender, m.PulseAccessor, 1, 1), getPulse, request,
+		)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to send GetPulse")
+		}
+
+		switch p := pl.(type) {
+		case *payload.Pulse:
+			return &pulseDescriptor{pulse: *insPulse.FromProto(&p.Pulse)}, nil
+		case *payload.Error:
+			err = errors.New(p.Text)
+			return nil, err
+		default:
+			err = fmt.Errorf("GetPulseForRequest: unexpected reply: %#v", p)
+			return nil, err
+		}
+	}
+
+	return &pulseDescriptor{pulse: foundedPulse}, nil
+}
+
 // GetCode returns code from code record by provided reference according to provided machine preference.
 //
 // This method is used by VM to fetch code for execution.

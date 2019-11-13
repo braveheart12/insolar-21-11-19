@@ -50,6 +50,9 @@ type Client interface {
 	// This method is used by VM to fetch code for execution.
 	GetCode(ctx context.Context, ref insolar.Reference) (CodeDescriptor, error)
 
+	// GetPulseForRequest returns pulse data for pulse number from request.
+	GetPulseForRequest(ctx context.Context, request insolar.Reference) (PulseDescriptor, error)
+
 	// GetObject returns object descriptor for the latest state.
 	GetObject(ctx context.Context, head insolar.Reference, request *insolar.Reference) (ObjectDescriptor, error)
 
@@ -130,6 +133,14 @@ type PrototypeDescriptor interface {
 	Code() *insolar.Reference
 }
 
+//go:generate minimock -i github.com/insolar/insolar/logicrunner/artifacts.PulseDescriptor -o ./ -s _mock.go -g
+
+// PulseDescriptor represents pulse data.
+type PulseDescriptor interface {
+	// Pulse returns pulse data.
+	Pulse() *insolar.Pulse
+}
+
 //go:generate minimock -i github.com/insolar/insolar/logicrunner/artifacts.DescriptorsCache -o ./ -s _mock.go -g
 
 // DescriptorsCache provides convenient way to get prototype and code descriptors
@@ -139,6 +150,7 @@ type DescriptorsCache interface {
 	ByObjectDescriptor(ctx context.Context, obj ObjectDescriptor) (PrototypeDescriptor, CodeDescriptor, error)
 	GetPrototype(ctx context.Context, ref insolar.Reference) (PrototypeDescriptor, error)
 	GetCode(ctx context.Context, ref insolar.Reference) (CodeDescriptor, error)
+	GetPulseForRequest(ctx context.Context, request insolar.Reference) (PulseDescriptor, error)
 }
 
 type RequestResultType uint8

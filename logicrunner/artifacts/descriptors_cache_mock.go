@@ -39,6 +39,12 @@ type DescriptorsCacheMock struct {
 	afterGetPrototypeCounter  uint64
 	beforeGetPrototypeCounter uint64
 	GetPrototypeMock          mDescriptorsCacheMockGetPrototype
+
+	funcGetPulseForRequest          func(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error)
+	inspectFuncGetPulseForRequest   func(ctx context.Context, ref insolar.Reference)
+	afterGetPulseForRequestCounter  uint64
+	beforeGetPulseForRequestCounter uint64
+	GetPulseForRequestMock          mDescriptorsCacheMockGetPulseForRequest
 }
 
 // NewDescriptorsCacheMock returns a mock for DescriptorsCache
@@ -59,6 +65,9 @@ func NewDescriptorsCacheMock(t minimock.Tester) *DescriptorsCacheMock {
 
 	m.GetPrototypeMock = mDescriptorsCacheMockGetPrototype{mock: m}
 	m.GetPrototypeMock.callArgs = []*DescriptorsCacheMockGetPrototypeParams{}
+
+	m.GetPulseForRequestMock = mDescriptorsCacheMockGetPulseForRequest{mock: m}
+	m.GetPulseForRequestMock.callArgs = []*DescriptorsCacheMockGetPulseForRequestParams{}
 
 	return m
 }
@@ -933,6 +942,223 @@ func (m *DescriptorsCacheMock) MinimockGetPrototypeInspect() {
 	}
 }
 
+type mDescriptorsCacheMockGetPulseForRequest struct {
+	mock               *DescriptorsCacheMock
+	defaultExpectation *DescriptorsCacheMockGetPulseForRequestExpectation
+	expectations       []*DescriptorsCacheMockGetPulseForRequestExpectation
+
+	callArgs []*DescriptorsCacheMockGetPulseForRequestParams
+	mutex    sync.RWMutex
+}
+
+// DescriptorsCacheMockGetPulseForRequestExpectation specifies expectation struct of the DescriptorsCache.GetPulseForRequest
+type DescriptorsCacheMockGetPulseForRequestExpectation struct {
+	mock    *DescriptorsCacheMock
+	params  *DescriptorsCacheMockGetPulseForRequestParams
+	results *DescriptorsCacheMockGetPulseForRequestResults
+	Counter uint64
+}
+
+// DescriptorsCacheMockGetPulseForRequestParams contains parameters of the DescriptorsCache.GetPulseForRequest
+type DescriptorsCacheMockGetPulseForRequestParams struct {
+	ctx context.Context
+	ref insolar.Reference
+}
+
+// DescriptorsCacheMockGetPulseForRequestResults contains results of the DescriptorsCache.GetPulseForRequest
+type DescriptorsCacheMockGetPulseForRequestResults struct {
+	p1  PulseDescriptor
+	err error
+}
+
+// Expect sets up expected params for DescriptorsCache.GetPulseForRequest
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) Expect(ctx context.Context, ref insolar.Reference) *mDescriptorsCacheMockGetPulseForRequest {
+	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
+		mmGetPulseForRequest.mock.t.Fatalf("DescriptorsCacheMock.GetPulseForRequest mock is already set by Set")
+	}
+
+	if mmGetPulseForRequest.defaultExpectation == nil {
+		mmGetPulseForRequest.defaultExpectation = &DescriptorsCacheMockGetPulseForRequestExpectation{}
+	}
+
+	mmGetPulseForRequest.defaultExpectation.params = &DescriptorsCacheMockGetPulseForRequestParams{ctx, ref}
+	for _, e := range mmGetPulseForRequest.expectations {
+		if minimock.Equal(e.params, mmGetPulseForRequest.defaultExpectation.params) {
+			mmGetPulseForRequest.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetPulseForRequest.defaultExpectation.params)
+		}
+	}
+
+	return mmGetPulseForRequest
+}
+
+// Inspect accepts an inspector function that has same arguments as the DescriptorsCache.GetPulseForRequest
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) Inspect(f func(ctx context.Context, ref insolar.Reference)) *mDescriptorsCacheMockGetPulseForRequest {
+	if mmGetPulseForRequest.mock.inspectFuncGetPulseForRequest != nil {
+		mmGetPulseForRequest.mock.t.Fatalf("Inspect function is already set for DescriptorsCacheMock.GetPulseForRequest")
+	}
+
+	mmGetPulseForRequest.mock.inspectFuncGetPulseForRequest = f
+
+	return mmGetPulseForRequest
+}
+
+// Return sets up results that will be returned by DescriptorsCache.GetPulseForRequest
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) Return(p1 PulseDescriptor, err error) *DescriptorsCacheMock {
+	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
+		mmGetPulseForRequest.mock.t.Fatalf("DescriptorsCacheMock.GetPulseForRequest mock is already set by Set")
+	}
+
+	if mmGetPulseForRequest.defaultExpectation == nil {
+		mmGetPulseForRequest.defaultExpectation = &DescriptorsCacheMockGetPulseForRequestExpectation{mock: mmGetPulseForRequest.mock}
+	}
+	mmGetPulseForRequest.defaultExpectation.results = &DescriptorsCacheMockGetPulseForRequestResults{p1, err}
+	return mmGetPulseForRequest.mock
+}
+
+//Set uses given function f to mock the DescriptorsCache.GetPulseForRequest method
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) Set(f func(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error)) *DescriptorsCacheMock {
+	if mmGetPulseForRequest.defaultExpectation != nil {
+		mmGetPulseForRequest.mock.t.Fatalf("Default expectation is already set for the DescriptorsCache.GetPulseForRequest method")
+	}
+
+	if len(mmGetPulseForRequest.expectations) > 0 {
+		mmGetPulseForRequest.mock.t.Fatalf("Some expectations are already set for the DescriptorsCache.GetPulseForRequest method")
+	}
+
+	mmGetPulseForRequest.mock.funcGetPulseForRequest = f
+	return mmGetPulseForRequest.mock
+}
+
+// When sets expectation for the DescriptorsCache.GetPulseForRequest which will trigger the result defined by the following
+// Then helper
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) When(ctx context.Context, ref insolar.Reference) *DescriptorsCacheMockGetPulseForRequestExpectation {
+	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
+		mmGetPulseForRequest.mock.t.Fatalf("DescriptorsCacheMock.GetPulseForRequest mock is already set by Set")
+	}
+
+	expectation := &DescriptorsCacheMockGetPulseForRequestExpectation{
+		mock:   mmGetPulseForRequest.mock,
+		params: &DescriptorsCacheMockGetPulseForRequestParams{ctx, ref},
+	}
+	mmGetPulseForRequest.expectations = append(mmGetPulseForRequest.expectations, expectation)
+	return expectation
+}
+
+// Then sets up DescriptorsCache.GetPulseForRequest return parameters for the expectation previously defined by the When method
+func (e *DescriptorsCacheMockGetPulseForRequestExpectation) Then(p1 PulseDescriptor, err error) *DescriptorsCacheMock {
+	e.results = &DescriptorsCacheMockGetPulseForRequestResults{p1, err}
+	return e.mock
+}
+
+// GetPulseForRequest implements DescriptorsCache
+func (mmGetPulseForRequest *DescriptorsCacheMock) GetPulseForRequest(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error) {
+	mm_atomic.AddUint64(&mmGetPulseForRequest.beforeGetPulseForRequestCounter, 1)
+	defer mm_atomic.AddUint64(&mmGetPulseForRequest.afterGetPulseForRequestCounter, 1)
+
+	if mmGetPulseForRequest.inspectFuncGetPulseForRequest != nil {
+		mmGetPulseForRequest.inspectFuncGetPulseForRequest(ctx, ref)
+	}
+
+	mm_params := &DescriptorsCacheMockGetPulseForRequestParams{ctx, ref}
+
+	// Record call args
+	mmGetPulseForRequest.GetPulseForRequestMock.mutex.Lock()
+	mmGetPulseForRequest.GetPulseForRequestMock.callArgs = append(mmGetPulseForRequest.GetPulseForRequestMock.callArgs, mm_params)
+	mmGetPulseForRequest.GetPulseForRequestMock.mutex.Unlock()
+
+	for _, e := range mmGetPulseForRequest.GetPulseForRequestMock.expectations {
+		if minimock.Equal(e.params, mm_params) {
+			mm_atomic.AddUint64(&e.Counter, 1)
+			return e.results.p1, e.results.err
+		}
+	}
+
+	if mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation.Counter, 1)
+		mm_want := mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation.params
+		mm_got := DescriptorsCacheMockGetPulseForRequestParams{ctx, ref}
+		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
+			mmGetPulseForRequest.t.Errorf("DescriptorsCacheMock.GetPulseForRequest got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+		}
+
+		mm_results := mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation.results
+		if mm_results == nil {
+			mmGetPulseForRequest.t.Fatal("No results are set for the DescriptorsCacheMock.GetPulseForRequest")
+		}
+		return (*mm_results).p1, (*mm_results).err
+	}
+	if mmGetPulseForRequest.funcGetPulseForRequest != nil {
+		return mmGetPulseForRequest.funcGetPulseForRequest(ctx, ref)
+	}
+	mmGetPulseForRequest.t.Fatalf("Unexpected call to DescriptorsCacheMock.GetPulseForRequest. %v %v", ctx, ref)
+	return
+}
+
+// GetPulseForRequestAfterCounter returns a count of finished DescriptorsCacheMock.GetPulseForRequest invocations
+func (mmGetPulseForRequest *DescriptorsCacheMock) GetPulseForRequestAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetPulseForRequest.afterGetPulseForRequestCounter)
+}
+
+// GetPulseForRequestBeforeCounter returns a count of DescriptorsCacheMock.GetPulseForRequest invocations
+func (mmGetPulseForRequest *DescriptorsCacheMock) GetPulseForRequestBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetPulseForRequest.beforeGetPulseForRequestCounter)
+}
+
+// Calls returns a list of arguments used in each call to DescriptorsCacheMock.GetPulseForRequest.
+// The list is in the same order as the calls were made (i.e. recent calls have a higher index)
+func (mmGetPulseForRequest *mDescriptorsCacheMockGetPulseForRequest) Calls() []*DescriptorsCacheMockGetPulseForRequestParams {
+	mmGetPulseForRequest.mutex.RLock()
+
+	argCopy := make([]*DescriptorsCacheMockGetPulseForRequestParams, len(mmGetPulseForRequest.callArgs))
+	copy(argCopy, mmGetPulseForRequest.callArgs)
+
+	mmGetPulseForRequest.mutex.RUnlock()
+
+	return argCopy
+}
+
+// MinimockGetPulseForRequestDone returns true if the count of the GetPulseForRequest invocations corresponds
+// the number of defined expectations
+func (m *DescriptorsCacheMock) MinimockGetPulseForRequestDone() bool {
+	for _, e := range m.GetPulseForRequestMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			return false
+		}
+	}
+
+	// if default expectation was set then invocations count should be greater than zero
+	if m.GetPulseForRequestMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterGetPulseForRequestCounter) < 1 {
+		return false
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcGetPulseForRequest != nil && mm_atomic.LoadUint64(&m.afterGetPulseForRequestCounter) < 1 {
+		return false
+	}
+	return true
+}
+
+// MinimockGetPulseForRequestInspect logs each unmet expectation
+func (m *DescriptorsCacheMock) MinimockGetPulseForRequestInspect() {
+	for _, e := range m.GetPulseForRequestMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			m.t.Errorf("Expected call to DescriptorsCacheMock.GetPulseForRequest with params: %#v", *e.params)
+		}
+	}
+
+	// if default expectation was set then invocations count should be greater than zero
+	if m.GetPulseForRequestMock.defaultExpectation != nil && mm_atomic.LoadUint64(&m.afterGetPulseForRequestCounter) < 1 {
+		if m.GetPulseForRequestMock.defaultExpectation.params == nil {
+			m.t.Error("Expected call to DescriptorsCacheMock.GetPulseForRequest")
+		} else {
+			m.t.Errorf("Expected call to DescriptorsCacheMock.GetPulseForRequest with params: %#v", *m.GetPulseForRequestMock.defaultExpectation.params)
+		}
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcGetPulseForRequest != nil && mm_atomic.LoadUint64(&m.afterGetPulseForRequestCounter) < 1 {
+		m.t.Error("Expected call to DescriptorsCacheMock.GetPulseForRequest")
+	}
+}
+
 // MinimockFinish checks that all mocked methods have been called the expected number of times
 func (m *DescriptorsCacheMock) MinimockFinish() {
 	if !m.minimockDone() {
@@ -943,6 +1169,8 @@ func (m *DescriptorsCacheMock) MinimockFinish() {
 		m.MinimockGetCodeInspect()
 
 		m.MinimockGetPrototypeInspect()
+
+		m.MinimockGetPulseForRequestInspect()
 		m.t.FailNow()
 	}
 }
@@ -969,5 +1197,6 @@ func (m *DescriptorsCacheMock) minimockDone() bool {
 		m.MinimockByObjectDescriptorDone() &&
 		m.MinimockByPrototypeRefDone() &&
 		m.MinimockGetCodeDone() &&
-		m.MinimockGetPrototypeDone()
+		m.MinimockGetPrototypeDone() &&
+		m.MinimockGetPulseForRequestDone()
 }
