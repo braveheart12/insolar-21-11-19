@@ -68,6 +68,7 @@ func TestGetPulse_NilMsgPayload(t *testing.T) {
 	t.Parallel()
 
 	ctx := inslogger.TestContext(t)
+	mc := minimock.NewController(t)
 	meta := payload.Meta{
 		Polymorph: uint32(payload.TypeMeta),
 		Payload:   nil,
@@ -75,8 +76,10 @@ func TestGetPulse_NilMsgPayload(t *testing.T) {
 
 	handler := handle.NewGetPulse(nil, meta)
 
-	err := handler.Present(ctx, flow.NewFlowMock(t))
+	err := handler.Present(ctx, flow.NewFlowMock(mc))
 	require.Error(t, err)
+
+	mc.Finish()
 }
 
 func TestGetPulse_BadMsgPayload(t *testing.T) {
@@ -98,7 +101,8 @@ func TestGetPulse_IncorrectTypeMsgPayload(t *testing.T) {
 	t.Parallel()
 
 	ctx := inslogger.TestContext(t)
-	f := flow.NewFlowMock(t)
+	mc := minimock.NewController(t)
+	f := flow.NewFlowMock(mc)
 
 	meta := payload.Meta{
 		Polymorph: uint32(payload.TypeMeta),
@@ -114,4 +118,6 @@ func TestGetPulse_IncorrectTypeMsgPayload(t *testing.T) {
 
 	err := handler.Present(ctx, f)
 	require.Error(t, err)
+
+	mc.Finish()
 }

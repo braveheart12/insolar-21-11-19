@@ -84,8 +84,7 @@ func TestGetPulse_Proceed(t *testing.T) {
 				Code:      payload.CodeNotFound,
 			}),
 		})
-		sender.
-			SendTargetMock.Return(reps, func() {})
+		sender.SendTargetMock.Return(reps, func() {})
 
 		p := proc.NewGetPulse(payload.Meta{}, pulse.MinTimePulse)
 		p.Dep(coordinator, sender)
