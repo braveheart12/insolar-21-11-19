@@ -54,8 +54,8 @@ type ClientMock struct {
 	beforeGetPrototypeCounter uint64
 	GetPrototypeMock          mClientMockGetPrototype
 
-	funcGetPulseForRequest          func(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error)
-	inspectFuncGetPulseForRequest   func(ctx context.Context, ref insolar.Reference)
+	funcGetPulseForRequest          func(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error)
+	inspectFuncGetPulseForRequest   func(ctx context.Context, request insolar.Reference)
 	afterGetPulseForRequestCounter  uint64
 	beforeGetPulseForRequestCounter uint64
 	GetPulseForRequestMock          mClientMockGetPulseForRequest
@@ -1489,8 +1489,8 @@ type ClientMockGetPulseForRequestExpectation struct {
 
 // ClientMockGetPulseForRequestParams contains parameters of the Client.GetPulseForRequest
 type ClientMockGetPulseForRequestParams struct {
-	ctx context.Context
-	ref insolar.Reference
+	ctx     context.Context
+	request insolar.Reference
 }
 
 // ClientMockGetPulseForRequestResults contains results of the Client.GetPulseForRequest
@@ -1500,7 +1500,7 @@ type ClientMockGetPulseForRequestResults struct {
 }
 
 // Expect sets up expected params for Client.GetPulseForRequest
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Expect(ctx context.Context, ref insolar.Reference) *mClientMockGetPulseForRequest {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Expect(ctx context.Context, request insolar.Reference) *mClientMockGetPulseForRequest {
 	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("ClientMock.GetPulseForRequest mock is already set by Set")
 	}
@@ -1509,7 +1509,7 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Expect(ctx context.Co
 		mmGetPulseForRequest.defaultExpectation = &ClientMockGetPulseForRequestExpectation{}
 	}
 
-	mmGetPulseForRequest.defaultExpectation.params = &ClientMockGetPulseForRequestParams{ctx, ref}
+	mmGetPulseForRequest.defaultExpectation.params = &ClientMockGetPulseForRequestParams{ctx, request}
 	for _, e := range mmGetPulseForRequest.expectations {
 		if minimock.Equal(e.params, mmGetPulseForRequest.defaultExpectation.params) {
 			mmGetPulseForRequest.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetPulseForRequest.defaultExpectation.params)
@@ -1520,7 +1520,7 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Expect(ctx context.Co
 }
 
 // Inspect accepts an inspector function that has same arguments as the Client.GetPulseForRequest
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Inspect(f func(ctx context.Context, ref insolar.Reference)) *mClientMockGetPulseForRequest {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Inspect(f func(ctx context.Context, request insolar.Reference)) *mClientMockGetPulseForRequest {
 	if mmGetPulseForRequest.mock.inspectFuncGetPulseForRequest != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("Inspect function is already set for ClientMock.GetPulseForRequest")
 	}
@@ -1544,7 +1544,7 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Return(p1 PulseDescri
 }
 
 //Set uses given function f to mock the Client.GetPulseForRequest method
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Set(f func(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error)) *ClientMock {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Set(f func(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error)) *ClientMock {
 	if mmGetPulseForRequest.defaultExpectation != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("Default expectation is already set for the Client.GetPulseForRequest method")
 	}
@@ -1559,14 +1559,14 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Set(f func(ctx contex
 
 // When sets expectation for the Client.GetPulseForRequest which will trigger the result defined by the following
 // Then helper
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) When(ctx context.Context, ref insolar.Reference) *ClientMockGetPulseForRequestExpectation {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) When(ctx context.Context, request insolar.Reference) *ClientMockGetPulseForRequestExpectation {
 	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("ClientMock.GetPulseForRequest mock is already set by Set")
 	}
 
 	expectation := &ClientMockGetPulseForRequestExpectation{
 		mock:   mmGetPulseForRequest.mock,
-		params: &ClientMockGetPulseForRequestParams{ctx, ref},
+		params: &ClientMockGetPulseForRequestParams{ctx, request},
 	}
 	mmGetPulseForRequest.expectations = append(mmGetPulseForRequest.expectations, expectation)
 	return expectation
@@ -1579,15 +1579,15 @@ func (e *ClientMockGetPulseForRequestExpectation) Then(p1 PulseDescriptor, err e
 }
 
 // GetPulseForRequest implements Client
-func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, ref insolar.Reference) (p1 PulseDescriptor, err error) {
+func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error) {
 	mm_atomic.AddUint64(&mmGetPulseForRequest.beforeGetPulseForRequestCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetPulseForRequest.afterGetPulseForRequestCounter, 1)
 
 	if mmGetPulseForRequest.inspectFuncGetPulseForRequest != nil {
-		mmGetPulseForRequest.inspectFuncGetPulseForRequest(ctx, ref)
+		mmGetPulseForRequest.inspectFuncGetPulseForRequest(ctx, request)
 	}
 
-	mm_params := &ClientMockGetPulseForRequestParams{ctx, ref}
+	mm_params := &ClientMockGetPulseForRequestParams{ctx, request}
 
 	// Record call args
 	mmGetPulseForRequest.GetPulseForRequestMock.mutex.Lock()
@@ -1604,7 +1604,7 @@ func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, 
 	if mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation != nil {
 		mm_atomic.AddUint64(&mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation.Counter, 1)
 		mm_want := mmGetPulseForRequest.GetPulseForRequestMock.defaultExpectation.params
-		mm_got := ClientMockGetPulseForRequestParams{ctx, ref}
+		mm_got := ClientMockGetPulseForRequestParams{ctx, request}
 		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
 			mmGetPulseForRequest.t.Errorf("ClientMock.GetPulseForRequest got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
@@ -1616,9 +1616,9 @@ func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, 
 		return (*mm_results).p1, (*mm_results).err
 	}
 	if mmGetPulseForRequest.funcGetPulseForRequest != nil {
-		return mmGetPulseForRequest.funcGetPulseForRequest(ctx, ref)
+		return mmGetPulseForRequest.funcGetPulseForRequest(ctx, request)
 	}
-	mmGetPulseForRequest.t.Fatalf("Unexpected call to ClientMock.GetPulseForRequest. %v %v", ctx, ref)
+	mmGetPulseForRequest.t.Fatalf("Unexpected call to ClientMock.GetPulseForRequest. %v %v", ctx, request)
 	return
 }
 
