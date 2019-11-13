@@ -214,7 +214,7 @@ func (m *client) GetPulseForRequest(
 	ctx, instrumenter := instrument(ctx, "GetPulseForRequest", &err)
 	defer instrumenter.end()
 
-	foundedPulse, err := m.PulseAccessor.ForPulseNumber(ctx, request.GetLocal().Pulse())
+	foundPulse, err := m.PulseAccessor.ForPulseNumber(ctx, request.GetLocal().Pulse())
 	if err != nil {
 		getPulse := &payload.GetPulse{
 			PulseNumber: request.GetLocal().Pulse(),
@@ -240,7 +240,7 @@ func (m *client) GetPulseForRequest(
 		}
 	}
 
-	return &pulseDescriptor{pulse: foundedPulse}, nil
+	return &pulseDescriptor{pulse: foundPulse}, nil
 }
 
 // GetCode returns code from code record by provided reference according to provided machine preference.

@@ -56,13 +56,13 @@ func (p *SendPulse) Proceed(ctx context.Context) error {
 		return errors.Wrap(err, "failed to unmarshal GetPulse message")
 	}
 
-	foundedPulse, err := p.dep.pulses.ForPulseNumber(ctx, getPulse.PulseNumber)
+	foundPulse, err := p.dep.pulses.ForPulseNumber(ctx, getPulse.PulseNumber)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch pulse data from storage")
 	}
 
 	msg, err := payload.NewMessage(&payload.Pulse{
-		Pulse: *pulse.ToProto(&foundedPulse),
+		Pulse: *pulse.ToProto(&foundPulse),
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to create reply")

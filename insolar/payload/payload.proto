@@ -382,5 +382,5 @@ message GetPulse {
 message Pulse {
     uint32 Polymorph = 16;
 
-    pulse.PulseProto Pulse = 24 [(gogoproto.nullable) = false];
+    pulse.PulseProto Pulse = 20 [(gogoproto.nullable) = false];
 }
