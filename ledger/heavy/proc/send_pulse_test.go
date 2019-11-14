@@ -43,7 +43,7 @@ func TestSendPulse_Proceed(t *testing.T) {
 		pulses *pulse.AccessorMock
 	)
 
-	resetComponents := func() {
+	setup := func() {
 		sender = bus.NewSenderMock(mc)
 		pulses = pulse.NewAccessorMock(mc)
 	}
@@ -54,20 +54,22 @@ func TestSendPulse_Proceed(t *testing.T) {
 		return p
 	}
 
-	resetComponents()
 	t.Run("pulse not found", func(t *testing.T) {
+		setup()
+		defer mc.Finish()
+
 		p := newProc(payload.Meta{})
 		pulses.ForPulseNumberMock.Return(insolar.Pulse{}, pulse.ErrNotFound)
 
 		err := p.Proceed(ctx)
 		require.Error(t, err)
 		assert.Equal(t, pulse.ErrNotFound, errors.Cause(err))
-
-		mc.Finish()
 	})
 
-	resetComponents()
 	t.Run("happy basic", func(t *testing.T) {
+		setup()
+		defer mc.Finish()
+
 		pulseNumber := insolar.PulseNumber(42)
 		msg := payload.GetPulse{
 			PulseNumber: pulseNumber,
@@ -92,7 +94,5 @@ func TestSendPulse_Proceed(t *testing.T) {
 
 		err = p.Proceed(ctx)
 		require.NoError(t, err)
-
-		mc.Finish()
 	})
 }

@@ -298,7 +298,8 @@ func (s *Init) Past(ctx context.Context, f flow.Flow) error {
 		payload.TypeGetRequest,
 		payload.TypePassState,
 		payload.TypeGetRequestInfo,
-		payload.TypeGetFilament:
+		payload.TypeGetFilament,
+		payload.TypeGetPulse:
 		return s.Present(ctx, f)
 	}
 
