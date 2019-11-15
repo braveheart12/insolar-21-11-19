@@ -8,14 +8,15 @@ import (
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
+	"github.com/insolar/insolar/insolar"
 )
 
 // CacheMock implements cache
 type CacheMock struct {
 	t minimock.Tester
 
-	funcget          func(key interface{}, getter func() (val interface{}, err error)) (val interface{}, err error)
-	inspectFuncget   func(key interface{}, getter func() (val interface{}, err error))
+	funcget          func(ref insolar.Reference, getter func() (val interface{}, err error)) (val interface{}, err error)
+	inspectFuncget   func(ref insolar.Reference, getter func() (val interface{}, err error))
 	aftergetCounter  uint64
 	beforegetCounter uint64
 	getMock          mCacheMockget
@@ -53,7 +54,7 @@ type CacheMockgetExpectation struct {
 
 // CacheMockgetParams contains parameters of the cache.get
 type CacheMockgetParams struct {
-	key    interface{}
+	ref    insolar.Reference
 	getter func() (val interface{}, err error)
 }
 
@@ -64,7 +65,7 @@ type CacheMockgetResults struct {
 }
 
 // Expect sets up expected params for cache.get
-func (mmget *mCacheMockget) Expect(key interface{}, getter func() (val interface{}, err error)) *mCacheMockget {
+func (mmget *mCacheMockget) Expect(ref insolar.Reference, getter func() (val interface{}, err error)) *mCacheMockget {
 	if mmget.mock.funcget != nil {
 		mmget.mock.t.Fatalf("CacheMock.get mock is already set by Set")
 	}
@@ -73,7 +74,7 @@ func (mmget *mCacheMockget) Expect(key interface{}, getter func() (val interface
 		mmget.defaultExpectation = &CacheMockgetExpectation{}
 	}
 
-	mmget.defaultExpectation.params = &CacheMockgetParams{key, getter}
+	mmget.defaultExpectation.params = &CacheMockgetParams{ref, getter}
 	for _, e := range mmget.expectations {
 		if minimock.Equal(e.params, mmget.defaultExpectation.params) {
 			mmget.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmget.defaultExpectation.params)
@@ -84,7 +85,7 @@ func (mmget *mCacheMockget) Expect(key interface{}, getter func() (val interface
 }
 
 // Inspect accepts an inspector function that has same arguments as the cache.get
-func (mmget *mCacheMockget) Inspect(f func(key interface{}, getter func() (val interface{}, err error))) *mCacheMockget {
+func (mmget *mCacheMockget) Inspect(f func(ref insolar.Reference, getter func() (val interface{}, err error))) *mCacheMockget {
 	if mmget.mock.inspectFuncget != nil {
 		mmget.mock.t.Fatalf("Inspect function is already set for CacheMock.get")
 	}
@@ -108,7 +109,7 @@ func (mmget *mCacheMockget) Return(val interface{}, err error) *CacheMock {
 }
 
 //Set uses given function f to mock the cache.get method
-func (mmget *mCacheMockget) Set(f func(key interface{}, getter func() (val interface{}, err error)) (val interface{}, err error)) *CacheMock {
+func (mmget *mCacheMockget) Set(f func(ref insolar.Reference, getter func() (val interface{}, err error)) (val interface{}, err error)) *CacheMock {
 	if mmget.defaultExpectation != nil {
 		mmget.mock.t.Fatalf("Default expectation is already set for the cache.get method")
 	}
@@ -123,14 +124,14 @@ func (mmget *mCacheMockget) Set(f func(key interface{}, getter func() (val inter
 
 // When sets expectation for the cache.get which will trigger the result defined by the following
 // Then helper
-func (mmget *mCacheMockget) When(key interface{}, getter func() (val interface{}, err error)) *CacheMockgetExpectation {
+func (mmget *mCacheMockget) When(ref insolar.Reference, getter func() (val interface{}, err error)) *CacheMockgetExpectation {
 	if mmget.mock.funcget != nil {
 		mmget.mock.t.Fatalf("CacheMock.get mock is already set by Set")
 	}
 
 	expectation := &CacheMockgetExpectation{
 		mock:   mmget.mock,
-		params: &CacheMockgetParams{key, getter},
+		params: &CacheMockgetParams{ref, getter},
 	}
 	mmget.expectations = append(mmget.expectations, expectation)
 	return expectation
@@ -143,15 +144,15 @@ func (e *CacheMockgetExpectation) Then(val interface{}, err error) *CacheMock {
 }
 
 // get implements cache
-func (mmget *CacheMock) get(key interface{}, getter func() (val interface{}, err error)) (val interface{}, err error) {
+func (mmget *CacheMock) get(ref insolar.Reference, getter func() (val interface{}, err error)) (val interface{}, err error) {
 	mm_atomic.AddUint64(&mmget.beforegetCounter, 1)
 	defer mm_atomic.AddUint64(&mmget.aftergetCounter, 1)
 
 	if mmget.inspectFuncget != nil {
-		mmget.inspectFuncget(key, getter)
+		mmget.inspectFuncget(ref, getter)
 	}
 
-	mm_params := &CacheMockgetParams{key, getter}
+	mm_params := &CacheMockgetParams{ref, getter}
 
 	// Record call args
 	mmget.getMock.mutex.Lock()
@@ -168,7 +169,7 @@ func (mmget *CacheMock) get(key interface{}, getter func() (val interface{}, err
 	if mmget.getMock.defaultExpectation != nil {
 		mm_atomic.AddUint64(&mmget.getMock.defaultExpectation.Counter, 1)
 		mm_want := mmget.getMock.defaultExpectation.params
-		mm_got := CacheMockgetParams{key, getter}
+		mm_got := CacheMockgetParams{ref, getter}
 		if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
 			mmget.t.Errorf("CacheMock.get got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
@@ -180,9 +181,9 @@ func (mmget *CacheMock) get(key interface{}, getter func() (val interface{}, err
 		return (*mm_results).val, (*mm_results).err
 	}
 	if mmget.funcget != nil {
-		return mmget.funcget(key, getter)
+		return mmget.funcget(ref, getter)
 	}
-	mmget.t.Fatalf("Unexpected call to CacheMock.get. %v %v", key, getter)
+	mmget.t.Fatalf("Unexpected call to CacheMock.get. %v %v", ref, getter)
 	return
 }
 
