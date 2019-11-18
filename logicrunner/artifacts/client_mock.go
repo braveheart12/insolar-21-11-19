@@ -54,7 +54,7 @@ type ClientMock struct {
 	beforeGetPrototypeCounter uint64
 	GetPrototypeMock          mClientMockGetPrototype
 
-	funcGetPulseForRequest          func(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error)
+	funcGetPulseForRequest          func(ctx context.Context, request insolar.Reference) (p1 insolar.Pulse, err error)
 	inspectFuncGetPulseForRequest   func(ctx context.Context, request insolar.Reference)
 	afterGetPulseForRequestCounter  uint64
 	beforeGetPulseForRequestCounter uint64
@@ -1495,7 +1495,7 @@ type ClientMockGetPulseForRequestParams struct {
 
 // ClientMockGetPulseForRequestResults contains results of the Client.GetPulseForRequest
 type ClientMockGetPulseForRequestResults struct {
-	p1  PulseDescriptor
+	p1  insolar.Pulse
 	err error
 }
 
@@ -1531,7 +1531,7 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Inspect(f func(ctx co
 }
 
 // Return sets up results that will be returned by Client.GetPulseForRequest
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Return(p1 PulseDescriptor, err error) *ClientMock {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Return(p1 insolar.Pulse, err error) *ClientMock {
 	if mmGetPulseForRequest.mock.funcGetPulseForRequest != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("ClientMock.GetPulseForRequest mock is already set by Set")
 	}
@@ -1544,7 +1544,7 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Return(p1 PulseDescri
 }
 
 //Set uses given function f to mock the Client.GetPulseForRequest method
-func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Set(f func(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error)) *ClientMock {
+func (mmGetPulseForRequest *mClientMockGetPulseForRequest) Set(f func(ctx context.Context, request insolar.Reference) (p1 insolar.Pulse, err error)) *ClientMock {
 	if mmGetPulseForRequest.defaultExpectation != nil {
 		mmGetPulseForRequest.mock.t.Fatalf("Default expectation is already set for the Client.GetPulseForRequest method")
 	}
@@ -1573,13 +1573,13 @@ func (mmGetPulseForRequest *mClientMockGetPulseForRequest) When(ctx context.Cont
 }
 
 // Then sets up Client.GetPulseForRequest return parameters for the expectation previously defined by the When method
-func (e *ClientMockGetPulseForRequestExpectation) Then(p1 PulseDescriptor, err error) *ClientMock {
+func (e *ClientMockGetPulseForRequestExpectation) Then(p1 insolar.Pulse, err error) *ClientMock {
 	e.results = &ClientMockGetPulseForRequestResults{p1, err}
 	return e.mock
 }
 
 // GetPulseForRequest implements Client
-func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, request insolar.Reference) (p1 PulseDescriptor, err error) {
+func (mmGetPulseForRequest *ClientMock) GetPulseForRequest(ctx context.Context, request insolar.Reference) (p1 insolar.Pulse, err error) {
 	mm_atomic.AddUint64(&mmGetPulseForRequest.beforeGetPulseForRequestCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetPulseForRequest.afterGetPulseForRequestCounter, 1)
 
