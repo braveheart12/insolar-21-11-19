@@ -209,7 +209,7 @@ func (m *client) RegisterOutgoingRequest(ctx context.Context, request *record.Ou
 // GetPulseForRequest returns pulse data for pulse number from request.
 func (m *client) GetPulseForRequest(
 	ctx context.Context, request insolar.Reference,
-) (PulseDescriptor, error) {
+) (insolar.Pulse, error) {
 	var err error
 	ctx, instrumenter := instrument(ctx, "GetPulseForRequest", &err)
 	defer instrumenter.end()
@@ -225,22 +225,22 @@ func (m *client) GetPulseForRequest(
 		)
 
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to send GetPulse")
+			return insolar.Pulse{}, errors.Wrap(err, "failed to send GetPulse")
 		}
 
 		switch p := pl.(type) {
 		case *payload.Pulse:
-			return &pulseDescriptor{pulse: *insPulse.FromProto(&p.Pulse)}, nil
+			return *insPulse.FromProto(&p.Pulse), nil
 		case *payload.Error:
 			err = errors.New(p.Text)
-			return nil, err
+			return insolar.Pulse{}, err
 		default:
 			err = fmt.Errorf("GetPulseForRequest: unexpected reply: %#v", p)
-			return nil, err
+			return insolar.Pulse{}, err
 		}
 	}
 
-	return &pulseDescriptor{pulse: foundPulse}, nil
+	return foundPulse, nil
 }
 
 // GetCode returns code from code record by provided reference according to provided machine preference.

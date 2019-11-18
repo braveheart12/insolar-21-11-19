@@ -20,7 +20,6 @@ import (
 	"context"
 	"sync"
 
-	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 
 	"github.com/insolar/insolar/insolar"
@@ -31,14 +30,12 @@ type descriptorsCache struct {
 
 	codeCache  cache
 	protoCache cache
-	pulseCache cache
 }
 
 func NewDescriptorsCache() DescriptorsCache {
 	return &descriptorsCache{
 		codeCache:  newSingleFlightCache(),
 		protoCache: newSingleFlightCache(),
-		pulseCache: newSingleFlightCache(),
 	}
 }
 
@@ -107,23 +104,10 @@ func (c *descriptorsCache) GetCode(
 	return res.(CodeDescriptor), nil
 }
 
-func (c *descriptorsCache) GetPulseForRequest(ctx context.Context, request insolar.Reference) (PulseDescriptor, error) {
-	pn := request.GetLocal().Pulse()
-
-	res, err := c.pulseCache.get(pn, func() (interface{}, error) {
-		return c.Client.GetPulseForRequest(ctx, request)
-	})
-	if err != nil {
-		return nil, errors.Wrapf(err, "couldn't get pulse for request: %s", request)
-	}
-
-	return res.(PulseDescriptor), nil
-}
-
 //go:generate minimock -i github.com/insolar/insolar/logicrunner/artifacts.cache -o ./ -s _mock.go -g
 
 type cache interface {
-	get(key interface{}, getter func() (val interface{}, err error)) (val interface{}, err error)
+	get(ref insolar.Reference, getter func() (val interface{}, err error)) (val interface{}, err error)
 }
 
 type cacheEntry struct {
@@ -132,41 +116,33 @@ type cacheEntry struct {
 }
 
 type singleFlightCache struct {
-	mu    sync.Mutex
-	cache *lru.Cache
+	mu sync.Mutex
+	m  map[insolar.Reference]*cacheEntry
 }
 
 func newSingleFlightCache() cache {
-	cache, err := lru.New(100)
-
-	if err != nil {
-		panic("failed to init cache")
+	return &singleFlightCache{
+		m: make(map[insolar.Reference]*cacheEntry),
 	}
-
-	return &singleFlightCache{cache: cache}
 }
 
-func (c *singleFlightCache) getEntry(key interface{}) *cacheEntry {
+func (c *singleFlightCache) getEntry(ref insolar.Reference) *cacheEntry {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if _, ok := c.cache.Get(key); !ok {
-		c.cache.Add(key, &cacheEntry{})
+	if _, ok := c.m[ref]; !ok {
+		c.m[ref] = &cacheEntry{}
 	}
-
-	entry, _ := c.cache.Get(key)
-	cEntry := entry.(*cacheEntry)
-
-	return cEntry
+	return c.m[ref]
 }
 
 func (c *singleFlightCache) get(
-	key interface{},
+	ref insolar.Reference,
 	getter func() (value interface{}, err error),
 ) (
 	interface{}, error,
 ) {
-	e := c.getEntry(key)
+	e := c.getEntry(ref)
 
 	e.mu.Lock()
 	defer e.mu.Unlock()

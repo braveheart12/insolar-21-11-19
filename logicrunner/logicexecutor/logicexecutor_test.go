@@ -94,12 +94,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -140,12 +134,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -183,12 +171,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 						artifacts.NewCodeDescriptorMock(mc).
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
-						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
 						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
@@ -228,12 +210,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 						artifacts.NewCodeDescriptorMock(mc).
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
-						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
 						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
@@ -351,12 +327,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -390,12 +360,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -428,12 +392,6 @@ func TestLogicExecutor_ExecuteMethod(t *testing.T) {
 						artifacts.NewCodeDescriptorMock(mc).
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
-						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
 						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
@@ -504,12 +462,6 @@ func TestLogicExecutor_ExecuteConstructor(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -550,12 +502,6 @@ func TestLogicExecutor_ExecuteConstructor(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -594,12 +540,6 @@ func TestLogicExecutor_ExecuteConstructor(t *testing.T) {
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
 						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
-						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr
 			},
@@ -634,12 +574,6 @@ func TestLogicExecutor_ExecuteConstructor(t *testing.T) {
 						artifacts.NewCodeDescriptorMock(mc).
 							RefMock.Return(&codeRef).
 							MachineTypeMock.Return(insolar.MachineTypeBuiltin),
-						nil,
-					).
-					GetPulseForRequestMock.
-					Return(
-						artifacts.NewPulseDescriptorMock(mc).
-							PulseMock.Return(&insolar.Pulse{PulseNumber: 42}),
 						nil,
 					)
 				return &logicExecutor{MachinesManager: mm, DescriptorsCache: dc}, tr

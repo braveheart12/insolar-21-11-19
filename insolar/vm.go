@@ -95,7 +95,6 @@ type LogicCallContext struct {
 	Parent    *Reference // Parent of the callee
 	Prototype *Reference // Prototype (base class) of the callee
 	Code      *Reference // Code reference of the callee
-	Pulse     *Pulse     // Pulse data for request
 
 	Caller          *Reference // Contract that made the call
 	CallerPrototype *Reference // Prototype (base class) of the caller
