@@ -20,10 +20,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/insolar/insolar/insolar"
 	"github.com/insolar/insolar/insolar/pulse"
 	"github.com/insolar/insolar/instrumentation/inslogger"
-	"github.com/pkg/errors"
 )
 
 // FinalizationKeeper check how far from each other last finalized pulse and current one
@@ -57,12 +58,21 @@ func (f *FinalizationKeeperDefault) OnPulse(ctx context.Context, current insolar
 		return errors.Wrap(err, "Can't get old pulse")
 	}
 
+	logger.Debugf(
+		"FinalizationKeeper: found old pulse, current pulse: %d, found: %d, limit: %d",
+		current, bottomLevel.PulseNumber, f.limit,
+	)
+
 	lastConfirmedPulse := f.jetKeeper.TopSyncPulse()
+	logger.Debugf("FinalizationKeeper: top sync pulse: %d", lastConfirmedPulse)
+
 	if current < lastConfirmedPulse {
+		logger.Error("FinalizationKeeper: less than last confirmed")
 		return errors.New(fmt.Sprintf("Current pulse ( %d ) is less than last confirmed ( %d )", current, lastConfirmedPulse))
 	}
 
 	if lastConfirmedPulse <= bottomLevel.PulseNumber {
+		logger.Error("FinalizationKeeper: chain limit, panic")
 		inslogger.FromContext(ctx).Panicf("last finalized pulse falls behind too much. Stop node. bottomLevel.PulseNumber: %d, last confirmed: %d", bottomLevel.PulseNumber, lastConfirmedPulse)
 	}
 
